@@ -1,6 +1,6 @@
 import heapq
 from collections import deque
-
+# a dictionary has been made which is storing the city name where key:value pair is city:(neighbour,cost) 
 cities = {
     "Arad": {"Zerind": 75, "Timisoara": 118, "Sibiu": 140},
     "Zerind": {"Oradea": 71, "Arad": 75},
@@ -24,6 +24,7 @@ cities = {
     "Neamt": {"Iasi": 87}
 }
 
+#another dictionary which store the heuristics of each city from 
 heuristic_value = {
     "Arad": 366, "Bucharest": 0, "Craiova": 160, "Drobeta": 242,
     "Eforie": 161, "Fagaras": 176, "Giurgiu": 77, "Hirsova": 151,
@@ -34,73 +35,73 @@ heuristic_value = {
 }
 
 def bfs(start_city, goal_city):
-    queue = deque([(start_city, [start_city])])
+    queue = deque([(start_city, [start_city], 0)])
     visited = set()
     while queue:
-        node, path = queue.popleft()
-        if node == goal_city:
-            return path
+        node, path, cost = queue.popleft()
+        if node == goal:
+            return path, cost
         if node not in visited:
             visited.add(node)
-            for neighbor in cities[node]:
-                queue.append((neighbor, path + [neighbor]))
-    return None
+            for neighbor, step_cost in cities[node].items():
+                queue.append((neighbor, path + [neighbor], cost + step_cost))
+    return None, float('inf')
 
 def uniform_cost_search(start_city, goal_city):
     queue = [(0, start_city, [start_city])]
     visited = set()
     while queue:
         cost, node, path = heapq.heappop(queue)
-        if node == goal_city:
+        if node == goal:
             return path, cost
         if node not in visited:
             visited.add(node)
             for neighbor, step_cost in cities[node].items():
                 heapq.heappush(queue, (cost + step_cost, neighbor, path + [neighbor]))
-    return None
+    return None, float('inf')
 
 def greedy_best_first(start_city, goal_city):
-    queue = [(heuristic_value[start_city], start_city, [start_city])]
+    queue = [(heuristic_value[start_city], start_city, [start_city], 0)]
     visited = set()
     while queue:
-        _, node, path = heapq.heappop(queue)
-        if node == goal_city:
-            return path
+        _, node, path, cost = heapq.heappop(queue)
+        if node == goal:
+            return path, cost
         if node not in visited:
             visited.add(node)
-            for neighbor in cities[node]:
-                heapq.heappush(queue, (heuristic_value[neighbor], neighbor, path + [neighbor]))
-    return None
+            for neighbor, step_cost in data[node].items():
+                heapq.heappush(queue, (heuristic_value[neighbor], neighbor, path + [neighbor], cost + step_cost))
+    return None, float('inf')
 
 def iterative_deepening_dfs(start_city, goal_city, max_depth=10):
-    def dls(node, path, depth):
-        if depth == 0 and node == goal_city:
-            return path
+    def dls(node, path, depth, cost):
+        if depth == 0 and node == goal:
+            return path, cost
         if depth > 0:
-            for neighbor in cities[node]:
-                new_path = dls(neighbor, path + [neighbor], depth - 1)
+            for neighbor, step_cost in cities[node].items():
+                new_path, new_cost = dls(neighbor, path + [neighbor], depth - 1, cost + step_cost)
                 if new_path:
-                    return new_path
-        return None
+                    return new_path, new_cost
+        return None, float('inf')
     
     for depth in range(max_depth):
-        result = dls(start_city, [start_city], depth)
+        result, cost = dls(start_city, [start_city], depth, 0)
         if result:
-            return result
-    return None
+            return result, cost
+    return None, float('inf')
 
 start_city = input("Enter start city: ")
 goal_city = input("Enter goal city: ")
-    
+
 print("\nBreadth-First Search:")
 print(bfs(start_city, goal_city))
-    
+
 print("\nUniform Cost Search:")
 path, cost = uniform_cost_search(start_city, goal_city)
 print(path, "Cost:", cost)
-    
+
 print("\nGreedy Best-First Search:")
 print(greedy_best_first(start_city, goal_city))
-    
+
 print("\nIterative Deepening DFS:")
 print(iterative_deepening_dfs(start_city, goal_city))
