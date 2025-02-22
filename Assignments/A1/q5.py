@@ -34,6 +34,7 @@ heuristic_value = {
     "Vaslui": 199, "Zerind": 374
 }
 
+# a breadth-first Search algorithm which visits each node in one level and then moves to the next if goal is not found within that level.
 def bfs(start_city, goal_city):
     queue = deque([(start_city, [start_city], 0)])
     visited = set()
@@ -47,6 +48,7 @@ def bfs(start_city, goal_city):
                 queue.append((neighbor, path + [neighbor], cost + step_cost))
     return None, float('inf')
 
+# a uniform-cost search algorithm where the lowest cost node is expanded first guarenteeing optimal pathway, might take longer than bfs if more than one city has same value
 def uniform_cost_search(start_city, goal_city):
     queue = [(0, start_city, [start_city])]
     visited = set()
@@ -60,6 +62,7 @@ def uniform_cost_search(start_city, goal_city):
                 heapq.heappush(queue, (cost + step_cost, neighbor, path + [neighbor]))
     return None, float('inf')
 
+# Greedy Best-First Search is an informed search algorithm which usues hueristic value(straight-line distance to goal). Its not always otimal.
 def greedy_best_first(start_city, goal_city):
     queue = [(heuristic_value[start_city], start_city, [start_city], 0)]
     visited = set()
@@ -73,6 +76,7 @@ def greedy_best_first(start_city, goal_city):
                 heapq.heappush(queue, (heuristic_value[neighbor], neighbor, path + [neighbor], cost + step_cost))
     return None, float('inf')
 
+# iterative deepening DFS is another type of uninformed search which uses the same principle as depth-first search however in this the limits gets increasing one by one if the goal node is not found.
 def iterative_deepening_dfs(start_city, goal_city, max_depth=10):
     def dls(node, path, depth, cost):
         if depth == 0 and node == goal:
@@ -90,6 +94,7 @@ def iterative_deepening_dfs(start_city, goal_city, max_depth=10):
             return result, cost
     return None, float('inf')
 
+#implementation of each algorithm.
 start_city = input("Enter start city: ")
 goal_city = input("Enter goal city: ")
 
